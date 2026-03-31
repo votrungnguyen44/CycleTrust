@@ -1,0 +1,5 @@
+/node_modules
+/public/uploads/bikes/*
+!/public/uploads/bikes/.gitkeep
+.DS_Store
+.cursor/
