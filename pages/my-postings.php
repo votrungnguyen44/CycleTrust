@@ -15,7 +15,7 @@ $stmt = $conn->prepare('SELECT * FROM bikes WHERE user_id = :user_id ORDER BY cr
 $stmt->execute([':user_id' => $userId]);
 $bikes = $stmt->fetchAll() ?: [];
 
-$fallbackImage = BASE_URL . 'public/assets/img/bike-placeholder.jpg';
+$defaultBikeOnError = BASE_URL . 'public/assets/images/default-bike.jpg';
 
 function bikeStatusLabel(array $bike): array
 {
@@ -74,26 +74,33 @@ function bikeStatusLabel(array $bike): array
               </tr>
             </thead>
             <tbody>
-              <?php foreach ($bikes as $bike): ?>
+              <?php foreach ($bikes as $row): ?>
                 <?php
-                $title = (string)($bike['title'] ?? '');
-                $imageFile = isset($bike['image_url']) && $bike['image_url'] !== ''
-                    ? BASE_URL . 'public/uploads/bikes/' . rawurlencode((string)$bike['image_url'])
-                    : $fallbackImage;
-                $price = isset($bike['price']) ? (float)$bike['price'] : 0;
+                $title = (string)($row['title'] ?? '');
+                $imageRaw = trim((string)($row['image_url'] ?? ''));
+                if ($imageRaw === '') {
+                    $imageFile = $defaultBikeOnError;
+                } elseif (str_starts_with(strtolower($imageRaw), 'http')) {
+                    $imageFile = $imageRaw;
+                } else {
+                    $imageFile = BASE_URL . 'public/uploads/products/' . $imageRaw;
+                }
+                $price = isset($row['price']) ? (float)$row['price'] : 0;
 
-                $createdAt = (string)($bike['created_at'] ?? '');
+                $createdAt = (string)($row['created_at'] ?? '');
                 $createdLabel = $createdAt !== '' ? date('d/m/Y', strtotime($createdAt)) : '-';
 
-                [$statusLabel, $statusClass] = bikeStatusLabel(is_array($bike) ? $bike : []);
-                $id = isset($bike['id']) ? (int)$bike['id'] : 0;
+                [$statusLabel, $statusClass] = bikeStatusLabel(is_array($row) ? $row : []);
+                $id = isset($row['id']) ? (int)$row['id'] : 0;
                 ?>
                 <tr>
                   <td>
                     <img
                       src="<?= htmlspecialchars($imageFile, ENT_QUOTES, 'UTF-8') ?>"
                       alt="<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?>"
-                      style="width: 72px; height: 54px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(33,33,33,0.12);"
+                      class="rounded"
+                      style="width: 60px; height: 60px; object-fit: cover;"
+                      onerror="this.onerror=null;this.src='public/assets/images/default-bike.jpg';"
                     >
                   </td>
                   <td>

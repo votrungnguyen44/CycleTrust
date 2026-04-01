@@ -77,9 +77,15 @@ if (!isset($_SESSION['user_id'])) {
               </div>
 
               <div class="col-12">
-                <label for="image" class="form-label fw-600">Hình ảnh xe <span class="text-danger">*</span></label>
+                <label for="image" class="form-label fw-600">Ảnh chính <span class="text-danger">*</span></label>
                 <input id="image" name="image" type="file" class="form-control" accept="image/*" required>
-                <div class="form-text">Chọn ảnh rõ, đủ sáng để tăng độ tin cậy.</div>
+                <div class="form-text">Ảnh đại diện tin đăng (bắt buộc).</div>
+              </div>
+
+              <div class="col-12">
+                <label for="gallery" class="form-label fw-600">Ảnh phụ (gallery)</label>
+                <input id="gallery" name="gallery[]" type="file" class="form-control" accept="image/*" multiple>
+                <div class="form-text">Có thể chọn nhiều ảnh; không bắt buộc.</div>
               </div>
 
               <div class="col-12">
